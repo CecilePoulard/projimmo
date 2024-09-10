@@ -1,0 +1,14 @@
+README.md
+setup.py
+projimmo/__init__.py
+projimmo/data.py
+projimmo/encoders.py
+projimmo/model.py
+projimmo/params.py
+projimmo/preprocessor.py
+projimmo/registry.py
+projimmo.egg-info/PKG-INFO
+projimmo.egg-info/SOURCES.txt
+projimmo.egg-info/dependency_links.txt
+projimmo.egg-info/requires.txt
+projimmo.egg-info/top_level.txt
