@@ -11,14 +11,81 @@ from colorama import Fore, Style
 from projimmo.params import *
 
 
-#def clean_data(df: pd.DataFrame) -> pd.DataFrame:
- #   """
-#    Clean raw data by
-#    - assigning correct dtypes to each column
-#    - removing buggy or irrelevant transactions
-#    """
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean raw data by
+   - assigning correct dtypes to each column
+    - removing buggy or irrelevant transactions
+    """
+
+    # Sélectionner les colonnes
+    df=df[COLUMN_NAMES_RAW ]
+    #Sélection des departement des 10 plus grandes villes
+    df=df[df['Code postal'].astype(str).str.startswith(tuple(DEPARTEMENTS))]
+
+
+    # Colonnes Carrez à traiter
+    carrez_cols = ['Surface Carrez du 1er lot', 'Surface Carrez du 2eme lot',
+               'Surface Carrez du 3eme lot', 'Surface Carrez du 4eme lot',
+               'Surface Carrez du 5eme lot']
+
+    # Remplacer les virgules par des points pour pouvoir les transformer en valeurs numériques
+    df['Valeur fonciere'] = df['Valeur fonciere'].str.replace(',', '.')
+    df[carrez_cols] = df[carrez_cols].apply(lambda col: col.str.replace(',', '.'))
+
+    # Remplacer les NaN dans les colonnes Carrez par 0
+    df[carrez_cols].fillna(0,inplace=True)
+    df[['Surface reelle bati'
+       , 'Nombre pieces principales'
+       , 'Surface terrain'
+       ,'Nombre de lots'
+       ,'Code type local'
+       ]].fillna(0,inplace=True)
+    #Calcul la somme des surface carrez pour tous les lots
+    df['somme surface carrez'] = df[carrez_cols].sum(axis=1)
+
+    # Ajout d'une colonne mois, d'une colonne annéee
+    df['Month mutation'] = df['Date mutation'].dt.month
+    df['Year mutation'] = df['Date mutation'].dt.year
+    # Supprimer les colonnes contenant les surfaces carrez,suppression de date mutation et Nature mutation
+    df.drop(columns=carrez_cols, inplace=True)
+    df = df.drop(columns=['Date mutation', 'Nature mutation'],inplace=True)
+
+
+    # Suppression des lignes qui n'ont pas de 'Valeur fonciere' ou de 'Code postal'
+    df.dropna(subset=['Valeur fonciere', 'Code postal'], inplace=True)
+    # Filtrer pour enlever les lignes où 'Nombre de lots', 'Surface reelle bati', ou 'somme surface carrez' sont égales à 0
+    df = df[(df['Nombre de lots'] != 0) \
+              (df['Surface reelle bati'] != 0) \
+              (df['somme surface carrez'] != 0)]
+
+    # Clean du nom des colonnes
+    def clean_column_names(df):
+        # Remplacer les majuscules par des minuscules et les espaces par des underscores
+        df.columns = df.columns.str.lower().str.replace(' ', '_')
+        return df
+
+    df = clean_column_names(df)
+    #df = df.astype(DTYPES_RAW)
+    return df
+
+
+def clean_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    # Calcul du Z-score
+    df=chunk.copy()
+    df['z_score'] = stats.zscore(df['valeur_fonciere'])
+    outliers = df[df['z_score'].abs() > 3]  # Seuil de 3
+
+    #Remove outliers
+    chunk = df[df['z_score'].abs() <= 3]
+
+    #Drop z_score
+    chunk = chunk.drop(['z_score'], axis=1)
+    return df
+
 
 #def concat
+#
 # """
 # concatene les df clean et preprocess pour chaque année
 
@@ -36,7 +103,9 @@ def get_data_with_cache(
 
     if cache_path.is_file():
         print(Fore.BLUE + "\nLoad data from local CSV..." + Style.RESET_ALL)
-        df = pd.read_csv(cache_path, header='infer' if data_has_header else None)
+        df = pd.read_csv(cache_path,sep="|", dtype=str)
+                         #, header='infer' if data_has_header else None)
+
     else:
         print(Fore.BLUE + "\nLoad data from BigQuery server..." + Style.RESET_ALL)
         client = bigquery.Client(project=gcp_project)
