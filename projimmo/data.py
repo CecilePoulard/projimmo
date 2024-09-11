@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-
+from scipy import stats
 from google.cloud import bigquery
 from pathlib import Path
 from colorama import Fore, Style
@@ -23,7 +23,14 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     #Sélection des departement des 10 plus grandes villes
     df=df[df['Code postal'].astype(str).str.startswith(tuple(DEPARTEMENTS))]
 
+    # Filtrer pour ne garder que les 'Vente' classiques
+    df = df[df['Nature mutation'] == 'Vente']
+    df = df[(df['Code type local'] == '1') | (df['Code type local'] == '2')]
 
+    # Ajout d'une colonne mois, d'une colonne annéee
+    df['Date mutation'] = pd.to_datetime(df['Date mutation'], format='%d/%m/%Y')
+    df['Month mutation'] = df['Date mutation'].dt.month
+    df['Year mutation'] = df['Date mutation'].dt.year
     # Colonnes Carrez à traiter
     carrez_cols = ['Surface Carrez du 1er lot', 'Surface Carrez du 2eme lot',
                'Surface Carrez du 3eme lot', 'Surface Carrez du 4eme lot',
@@ -41,22 +48,25 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
        ,'Nombre de lots'
        ,'Code type local'
        ]].fillna(0,inplace=True)
+
+     # Convert relevant columns to numeric
+    df[carrez_cols] = df[carrez_cols].apply(pd.to_numeric, errors='coerce')
+    df['Valeur fonciere'] = pd.to_numeric(df['Valeur fonciere'], errors='coerce')
+
     #Calcul la somme des surface carrez pour tous les lots
     df['somme surface carrez'] = df[carrez_cols].sum(axis=1)
 
-    # Ajout d'une colonne mois, d'une colonne annéee
-    df['Month mutation'] = df['Date mutation'].dt.month
-    df['Year mutation'] = df['Date mutation'].dt.year
+
     # Supprimer les colonnes contenant les surfaces carrez,suppression de date mutation et Nature mutation
     df.drop(columns=carrez_cols, inplace=True)
-    df = df.drop(columns=['Date mutation', 'Nature mutation'],inplace=True)
+    df.drop(columns=['Date mutation', 'Nature mutation'],inplace=True)
 
 
     # Suppression des lignes qui n'ont pas de 'Valeur fonciere' ou de 'Code postal'
     df.dropna(subset=['Valeur fonciere', 'Code postal'], inplace=True)
     # Filtrer pour enlever les lignes où 'Nombre de lots', 'Surface reelle bati', ou 'somme surface carrez' sont égales à 0
-    df = df[(df['Nombre de lots'] != 0) \
-              (df['Surface reelle bati'] != 0) \
+    df = df[(df['Nombre de lots'] != 0) &
+              (df['Surface reelle bati'] != 0) &
               (df['somme surface carrez'] != 0)]
 
     # Clean du nom des colonnes
@@ -66,21 +76,22 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     df = clean_column_names(df)
-    #df = df.astype(DTYPES_RAW)
+    df.rename(columns={'code_postal': 'departement'}, inplace=True)
+    df = df.astype(DTYPES_RAW)
     return df
 
 
 def clean_outliers(df: pd.DataFrame) -> pd.DataFrame:
     # Calcul du Z-score
-    df=chunk.copy()
+    df=df.copy()
     df['z_score'] = stats.zscore(df['valeur_fonciere'])
-    outliers = df[df['z_score'].abs() > 3]  # Seuil de 3
+    #outliers = df[df['z_score'].abs() > 3]  # Seuil de 3
 
     #Remove outliers
-    chunk = df[df['z_score'].abs() <= 3]
+    df = df[df['z_score'].abs() <= 3]
 
     #Drop z_score
-    chunk = chunk.drop(['z_score'], axis=1)
+    df = df.drop(['z_score'], axis=1)
     return df
 
 

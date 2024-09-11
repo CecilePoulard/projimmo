@@ -38,14 +38,18 @@ COLUMN_NAMES_RAW = ['Date mutation', 'Nature mutation', 'Valeur fonciere',
 DEPARTEMENTS=['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
 
 DTYPES_RAW = {
-    "fare_amount": "float32",
-    "pickup_datetime": "datetime64[ns, UTC]",
-    "pickup_longitude": "float32",
-    "pickup_latitude": "float32",
-    "dropoff_longitude": "float32",
-    "dropoff_latitude": "float32",
-    "passenger_count": "int16"
-}
+    'valeur_fonciere':"float",
+    'type_de_voie': "str",
+    'departement':"int",
+    'nombre_de_lots': "int",
+    'code_type_local': "int",
+    'surface_reelle_bati': "float",
+    'nombre_pieces_principales': "float",
+       'surface_terrain': "float",
+#       'month_mutation': "int",
+#       'year_mutation': "int",
+       'somme_surface_carrez': "float"}
+
 
 #DTYPES_PROCESSED = np.float32
 
