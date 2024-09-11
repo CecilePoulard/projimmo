@@ -32,7 +32,7 @@ setup(name='projimmo',
 
 ##In project projimmo, create '.python-version' that
 ##activates projimmoenv when present
-#pyenv local projimmo
+#pyenv local projimmoenv
 
 ##Pour savoir les version des librairies
 #pip list

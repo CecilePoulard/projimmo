@@ -5,15 +5,15 @@ import numpy as np
 DATA_SIZE = os.environ.get("DATA_SIZE")
 CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE"))
 DATA_DIR = os.environ.get("DATA_DIR")
-
-#MODEL_TARGET = os.environ.get("MODEL_TARGET")
-#GCP_PROJECT = os.environ.get("GCP_PROJECT")
-#GCP_PROJECT_WAGON = os.environ.get("GCP_PROJECT_WAGON")
-#GCP_REGION = os.environ.get("GCP_REGION")
-#BQ_DATASET = os.environ.get("BQ_DATASET")
-#BQ_REGION = os.environ.get("BQ_REGION")
-#BUCKET_NAME = os.environ.get("BUCKET_NAME")
-#INSTANCE = os.environ.get("INSTANCE")
+DATA_YEAR = os.environ.get("DATA_YEAR")
+MODEL_TARGET = os.environ.get("MODEL_TARGET")
+GCP_PROJECT = os.environ.get("GCP_PROJECT")
+GCP_PROJECT_WAGON = os.environ.get("GCP_PROJECT_WAGON")
+GCP_REGION = os.environ.get("GCP_REGION")
+BQ_DATASET = os.environ.get("BQ_DATASET")
+BQ_REGION = os.environ.get("BQ_REGION")
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+INSTANCE = os.environ.get("INSTANCE")
 #MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
 #MLFLOW_EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT")
 #MLFLOW_MODEL_NAME = os.environ.get("MLFLOW_MODEL_NAME")
@@ -24,10 +24,18 @@ DATA_DIR = os.environ.get("DATA_DIR")
 #GAR_MEMORY = os.environ.get("GAR_MEMORY")
 
 ##################  CONSTANTS  #####################
-#LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "data")
+LOCAL_DATA_PATH = "raw_data/"#valeursfoncieres-2023.txt
+#os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "data")
 #LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
 
-#COLUMN_NAMES_RAW = ['fare_amount','pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude', 'passenger_count']
+COLUMN_NAMES_RAW = ['Date mutation', 'Nature mutation', 'Valeur fonciere',
+        'Type de voie', 'Code postal', 'Surface Carrez du 1er lot',
+        'Surface Carrez du 2eme lot', 'Surface Carrez du 3eme lot',
+        'Surface Carrez du 4eme lot', 'Surface Carrez du 5eme lot',
+        'Nombre de lots', 'Code type local', 'Surface reelle bati',
+        'Nombre pieces principales', 'Surface terrain']
+
+DEPARTEMENTS=['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
 
 DTYPES_RAW = {
     "fare_amount": "float32",
