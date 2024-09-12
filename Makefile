@@ -15,6 +15,7 @@
 
 ## Dans le terminal 'make install_package'
 install_package:
+	@pip uninstall -y projimmo || :
 	@pip install -e .
 
 
