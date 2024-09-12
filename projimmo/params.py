@@ -1,3 +1,4 @@
+#projimmo/params.py
 import os
 import numpy as np
 
@@ -46,8 +47,6 @@ DTYPES_RAW = {
     'surface_reelle_bati': "float",
     'nombre_pieces_principales': "float",
        'surface_terrain': "float",
-#       'month_mutation': "int",
-#       'year_mutation': "int",
        'somme_surface_carrez': "float"}
 
 

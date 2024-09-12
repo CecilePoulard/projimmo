@@ -17,35 +17,18 @@ from colorama import Fore, Style
 
 
 def preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
-#    def create_sklearn_preprocessor() -> ColumnTransformer:
- #       """
- #       Scikit-learn pipeline that transforms a cleaned dataset of shape (_, 7)
- #       into a preprocessed one of fixed shape (_, 65).
-#
- #       Stateless operation: "fit_transform()" equals "transform()".
- #      """
-
- # ..............
-
- #    preprocessor = create_sklearn_preprocessor()
- #   X_processed = preprocessor.fit_transform(X)
-
- #
-
-  #  return X_processed
   # Définir les pipelines de prétraitement
     preproc_robust = make_pipeline(RobustScaler())
     preproc_standard = make_pipeline(StandardScaler())
     preproc_categorical_baseline = make_pipeline(OneHotEncoder(handle_unknown="ignore"))
-##################################### A modifier!!!!!!!! ################
     preproc_ordinal = make_pipeline(OrdinalEncoder())
 
     # Définir le transformer de colonnes
     preproc_baseline = make_column_transformer(
         (preproc_standard, ['surface_reelle_bati']),
         (preproc_robust, ['surface_terrain', 'somme_surface_carrez','valeur_fonciere']),
-        (preproc_categorical_baseline, ['code_type_local', 'type_de_voie', 'departement']),
-        (preproc_ordinal, ['nombre_pieces_principales', 'month_mutation', 'year_mutation']),
+        (preproc_categorical_baseline, ['code_type_local', 'type_de_voie']),
+        (preproc_ordinal, ['nombre_pieces_principales', 'month_mutation', 'year_mutation','departement']),
         remainder='passthrough')
     # Transformer les données
     X_trans = preproc_baseline.fit_transform(X)

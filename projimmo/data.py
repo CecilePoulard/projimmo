@@ -41,13 +41,19 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df[carrez_cols] = df[carrez_cols].apply(lambda col: col.str.replace(',', '.'))
 
     # Remplacer les NaN dans les colonnes Carrez par 0
-    df[carrez_cols].fillna(0,inplace=True)
+    df[carrez_cols]=df[carrez_cols].fillna(0)
+
     df[['Surface reelle bati'
        , 'Nombre pieces principales'
        , 'Surface terrain'
        ,'Nombre de lots'
        ,'Code type local'
-       ]].fillna(0,inplace=True)
+       ]]=df[['Surface reelle bati'
+       , 'Nombre pieces principales'
+       , 'Surface terrain'
+       ,'Nombre de lots'
+       ,'Code type local'
+       ]].fillna(0)
 
      # Convert relevant columns to numeric
     df[carrez_cols] = df[carrez_cols].apply(pd.to_numeric, errors='coerce')
@@ -76,7 +82,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     df = clean_column_names(df)
-    df.rename(columns={'code_postal': 'departement'}, inplace=True)
+    df['departement'] = df['code_postal'].str[:2]
+    df = df.drop(columns=['code_postal'])
+    #df.rename(columns={'code_postal': 'departement'}, inplace=True)
     df = df.astype(DTYPES_RAW)
     return df
 
