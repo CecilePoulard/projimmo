@@ -10,6 +10,10 @@ from sklearn.metrics import accuracy_score  # Pour les tâches de classification
 import numpy as np
 
 def split_df(df,test_size=0.2):
+    """
+    Split dataset into train_test_split
+    - possibilité de changer le test_size (par défaut 0.2)
+    """
 # Split the data into training and testing sets
     X=df.drop(columns='valeur_fonciere').copy()
     y=df.valeur_fonciere.copy()
@@ -18,6 +22,11 @@ def split_df(df,test_size=0.2):
 
 
 def initialize_model(model_type,n_neighbors=5,objective='reg:squarederror', max_depth=4, eta=0.1, n_estimators=100):
+    """
+    Initialise le model selon le choix de l'utilisateur
+    - nombre de cluster pour le KNR: n_neighbors=5
+    - parametres par défaut pour le XGboost objective='reg:squarederror', max_depth=4, eta=0.1, n_estimators=100
+    """
     if model_type=="KNR":
         model = KNeighborsRegressor(n_neighbors=n_neighbors)
     elif model_type=="LR":
@@ -29,15 +38,20 @@ def initialize_model(model_type,n_neighbors=5,objective='reg:squarederror', max_
 
 
 def train_model(X_train,y_train,model):
+    """
+    entraine le modele
+    """
     fitted_model=model.fit(X_train, y_train)
     return fitted_model
-
-    # Create a k-NN regressor object and fit it to the training data
 
 
 
 
 def evaluate_model(X_test,y_test,model, model_type):
+    """
+    Evalue le modele selon le type de modele
+    retourne différentes metrics
+    """
     # Make predictions on the testing data
     y_pred = model.predict(X_test)
     if model_type in ["KNR", "LR", "XGB"]:

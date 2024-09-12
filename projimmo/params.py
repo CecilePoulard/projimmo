@@ -49,6 +49,23 @@ DTYPES_RAW = {
        'surface_terrain': "float",
        'somme_surface_carrez': "float"}
 
+PARAM_GRID_KNN= {
+    'n_neighbors': [3, 5, 7, 9],
+    #'weights': ['uniform', 'distance'],
+    #'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute']
+}
+
+PARAM_GRID_LR= {
+    'alpha': [0.1, 1, 10, 100]  # Pour Ridge ou Lasso,à modifier selon modele
+}
+
+
+PARAM_GRID_XGB = {
+    'objective': ['reg:squarederror', 'reg:squaredlogerror'],
+    'max_depth': [3, 4, 5, 6],
+    'eta': [0.01, 0.1, 0.2],
+    'n_estimators': [50, 100, 150]
+}
 
 #DTYPES_PROCESSED = np.float32
 
