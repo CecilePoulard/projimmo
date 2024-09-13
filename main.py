@@ -1,5 +1,86 @@
 #main.py
 
+import os
+import pandas as pd
+from google.cloud import bigquery
+from pathlib import Path
+
+from projimmo.params import *
+from projimmo.data import *
+
+def load_all_files():
+    """
+    Charge tous les fichiers CSV dans le répertoire local_path,
+    les concatène en un seul DataFrame.
+    """
+    data_local_path = Path(LOCAL_DATA_PATH)
+    # Verif que data_local_path bien un répertoire
+    if not data_local_path.is_dir():
+        raise ValueError(f"{data_local_path} n'est pas un répertoire valide.")
+
+    table=f"DVF_cleaned_{DATA_YEAR}"
+    #all_files = [f for f in data_local_path if f.is_file()]
+    all_files = list(data_local_path.glob('*.txt'))
+
+    if not all_files:
+        print("Aucun fichier CSV trouvé dans le répertoire spécifié.")
+        return
+
+    for file in all_files:
+        df = pd.read_csv(file, sep="|", dtype=str)
+        print(file)
+        clean_and_load(df)
+    return table
+
+
+def clean_and_load(df, table):
+    """
+    Nettoie le df en param et la charge dans bigQuery
+    """
+    #df = pd.concat(df_list, ignore_index=True)
+    #print("concat ok")
+    df = clean_data(df)
+    print("✅  clean ok \n")
+    df = clean_outliers(df)
+    print("✅ outliers ok\n")
+    load_data_to_bq(
+    data=df,
+    gcp_project=GCP_PROJECT,
+    bq_dataset=BQ_DATASET,
+    table=table,
+    truncate=False ) # Append the data to the existing table
+    print("✅ load ok\n")
+
+def preprocess():
+    table_cleaned=load_all_files()
+    query = f"""
+        SELECT *
+        FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table_cleaned}
+    """
+    #Pour écrire dans big query le df notre choix
+#load_data_to_bq(
+#        df_de_notre_choix,
+ #       gcp_project=GCP_PROJECT,
+ #       bq_dataset=BQ_DATASET,
+ #       table=table_cleaned',
+ #       truncate=True
+  #  )
+    df_to_preproc=get_data_with_cache(
+        query=query,
+        gcp_project=GCP_PROJECT,
+       # cache_path:Path,
+        data_has_header=True
+   )
+
+
+if __name__ == "__main__":
+#    concat_and_load() # A faire qu'une fois!! Sinon va ajouter
+
+
+
+
+
+
 
 
 

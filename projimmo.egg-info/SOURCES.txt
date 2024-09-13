@@ -4,6 +4,7 @@ projimmo/__init__.py
 projimmo/data.py
 projimmo/encoders.py
 projimmo/model.py
+projimmo/optimize_model.py
 projimmo/params.py
 projimmo/preprocessor.py
 projimmo/registry.py

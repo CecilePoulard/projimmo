@@ -61,11 +61,12 @@ PARAM_GRID_LR= {
 
 
 PARAM_GRID_XGB = {
-    'objective': ['reg:squarederror', 'reg:squaredlogerror'],
+    #'objective': ['reg:squarederror', 'reg:squaredlogerror'],
     'max_depth': [3, 4, 5, 6],
     'eta': [0.01, 0.1, 0.2],
     'n_estimators': [50, 100, 150]
 }
+
 
 #DTYPES_PROCESSED = np.float32
 

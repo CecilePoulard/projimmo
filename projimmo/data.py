@@ -74,7 +74,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df[(df['Nombre de lots'] != 0) &
               (df['Surface reelle bati'] != 0) &
               (df['somme surface carrez'] != 0)]
-
+    type_voie_to_keep = ['RUE', 'AV', 'CHE', 'BD', 'RTE', 'ALL', 'IMP', 'PL', 'RES', 'CRS']
+    df['Type de voie'] = df['Type de voie'].where(df['Type de voie'].isin(type_voie_to_keep), 'AUTRE')
     # Clean du nom des colonnes
     def clean_column_names(df):
         # Remplacer les majuscules par des minuscules et les espaces par des underscores
@@ -84,6 +85,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = clean_column_names(df)
     df['departement'] = df['code_postal'].str[:2]
     df = df.drop(columns=['code_postal'])
+
     #df.rename(columns={'code_postal': 'departement'}, inplace=True)
     df = df.astype(DTYPES_RAW)
     return df
@@ -176,7 +178,7 @@ def load_data_to_bq(
     job_config = bigquery.LoadJobConfig(write_disposition=write_mode)
 
     print(f"\n{'Write' if truncate else 'Append'} {full_table_name} ({data.shape[0]} rows)")
-
+    #ensure_table_exists(gcp_project, bq_dataset, table)
 # charge les données dans bigquery
     job = client.load_table_from_dataframe(data, full_table_name, job_config=job_config)
 #Cette méthode attend que le chargement soit terminé avant de continuer.

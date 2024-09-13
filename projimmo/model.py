@@ -6,20 +6,49 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, mean_squared_log_error
 from sklearn.metrics import accuracy_score  # Pour les tâches de classification
+from sklearn.model_selection import cross_val_score, cross_validate
 
 import numpy as np
 
-def split_df(df,test_size=0.2):
+def split_df(X,y,test_size=0.2):
     """
     Split dataset into train_test_split
     - possibilité de changer le test_size (par défaut 0.2)
     """
 # Split the data into training and testing sets
-    X=df.drop(columns='valeur_fonciere').copy()
-    y=df.valeur_fonciere.copy()
+    #X=df.drop(columns='valeur_fonciere').copy()
+    #y=df.valeur_fonciere.copy()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
     return X_train, X_test, y_train, y_test
 
+
+
+def cross_validate_model(X, y, model, cv=5,scoring='neg_mean_squared_error'):
+    """
+    Effectue une validation croisée pour évaluer le modèle.
+
+    Parameters:
+    - X: Les caractéristiques des données.
+    - y: Les cibles des données.
+    - model: Le modèle à évaluer.
+    - cv: Le nombre de folds pour la validation croisée.
+
+    Returns:
+    - results: Les scores de validation croisée.
+    """
+    # Effectuer la validation croisée
+    results = cross_validate(model, X, y, cv=cv, scoring=scoring, return_train_score=False)
+
+    # Convertir les scores négatifs en positifs pour une meilleure interprétation
+    mse_scores = -results['test_score']
+    mean_mse = np.mean(mse_scores)
+    std_mse = np.std(mse_scores)
+
+    print(f"Validation croisée :")
+    print(f"MSE moyen: {mean_mse:.2f}")
+    print(f"Écart-type du MSE: {std_mse:.2f}")
+
+    return results
 
 def initialize_model(model_type,n_neighbors=5,objective='reg:squarederror', max_depth=4, eta=0.1, n_estimators=100):
     """

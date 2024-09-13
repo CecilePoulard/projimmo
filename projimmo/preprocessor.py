@@ -20,15 +20,15 @@ def preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
   # Définir les pipelines de prétraitement
     preproc_robust = make_pipeline(RobustScaler())
     preproc_standard = make_pipeline(StandardScaler())
-    preproc_categorical_baseline = make_pipeline(OneHotEncoder(handle_unknown="ignore", drop='if_binary'))
+    preproc_categorical_baseline = make_pipeline(OneHotEncoder(handle_unknown="ignore"))
     preproc_ordinal = make_pipeline(OrdinalEncoder())
 
     # Définir le transformer de colonnes
     preproc_baseline = make_column_transformer(
         (preproc_standard, ['surface_reelle_bati']),
-        (preproc_robust, ['surface_terrain', 'somme_surface_carrez','valeur_fonciere']),
-        (preproc_categorical_baseline, ['code_type_local', 'type_de_voie']),
-        (preproc_ordinal, ['nombre_pieces_principales', 'month_mutation', 'year_mutation','departement']),
+        (preproc_robust, ['surface_terrain', 'somme_surface_carrez']),#,'valeur_fonciere'
+        (preproc_categorical_baseline, ['code_type_local', 'type_de_voie', 'month_mutation', 'year_mutation','departement']),
+        (preproc_ordinal, ['nombre_pieces_principales']),
         remainder='passthrough')
     # Transformer les données
     X_trans = preproc_baseline.fit_transform(X)

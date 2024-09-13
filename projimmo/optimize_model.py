@@ -27,4 +27,4 @@ def grid_search(X_train, y_train, model_type,initialized_model):
     print(f"Best parameters for {model_type}: {grid_search.best_params_}")
     print(f"Best score for {model_type}: {-grid_search.best_score_}")
 
-    return grid_search.best_estimator_
+    return grid_search.best_params_
