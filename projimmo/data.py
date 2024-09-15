@@ -6,7 +6,7 @@ from scipy import stats
 from google.cloud import bigquery
 from pathlib import Path
 from colorama import Fore, Style
-
+from google.api_core.exceptions import NotFound
 
 from projimmo.params import *
 
@@ -31,6 +31,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df['Date mutation'] = pd.to_datetime(df['Date mutation'], format='%d/%m/%Y')
     df['Month mutation'] = df['Date mutation'].dt.month
     df['Year mutation'] = df['Date mutation'].dt.year
+
     # Colonnes Carrez à traiter
     carrez_cols = ['Surface Carrez du 1er lot', 'Surface Carrez du 2eme lot',
                'Surface Carrez du 3eme lot', 'Surface Carrez du 4eme lot',
@@ -76,6 +77,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
               (df['somme surface carrez'] != 0)]
     type_voie_to_keep = ['RUE', 'AV', 'CHE', 'BD', 'RTE', 'ALL', 'IMP', 'PL', 'RES', 'CRS']
     df['Type de voie'] = df['Type de voie'].where(df['Type de voie'].isin(type_voie_to_keep), 'AUTRE')
+
+    df['Valeur fonciere'] =np.log1p(df['Valeur fonciere'])
     # Clean du nom des colonnes
     def clean_column_names(df):
         # Remplacer les majuscules par des minuscules et les espaces par des underscores
@@ -85,10 +88,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = clean_column_names(df)
     df['departement'] = df['code_postal'].str[:2]
     df = df.drop(columns=['code_postal'])
+    df_cleaned = df.drop_duplicates()
 
-    #df.rename(columns={'code_postal': 'departement'}, inplace=True)
-    df = df.astype(DTYPES_RAW)
-    return df
+    df_cleaned = df_cleaned.astype(DTYPES_RAW)
+    return df_cleaned
 
 
 def clean_outliers(df: pd.DataFrame) -> pd.DataFrame:
@@ -134,8 +137,8 @@ def get_data_with_cache(
         result = query_job.result()
         df = result.to_dataframe()
         # Store as CSV if the BQ query returned at least one valid line
-        if df.shape[0] > 1:
-            df.to_csv(cache_path, header=data_has_header, index=False)
+        #if df.shape[0] > 1:
+        #    df.to_csv(cache_path, header=data_has_header, index=False)
 
     print(f"✅ Data loaded, with shape {df.shape}")
 
@@ -165,14 +168,32 @@ def load_data_to_bq(
     print(Fore.BLUE + f"\nSave data to BigQuery @ {full_table_name}...:" + Style.RESET_ALL)
 
 
+
+    # Vérification si la table existe
+   # try:
+   #     client.get_table(full_table_name)
+   #     table_exists = True
+   #     print(Fore.GREEN + f"La table {full_table_name} existe." + Style.RESET_ALL)
+   # except NotFound:
+   #     table_exists = False
+   #     print(Fore.YELLOW + f"La table {full_table_name} n'existe pas, elle sera créée." + Style.RESET_ALL)
+
+    # Si la table existe et que truncate est spécifié, on vide la table
+    #if table_exists and not truncate:
+    #    print(Fore.RED + f"Remplace la table {full_table_name} ..." + Style.RESET_ALL)
+    #    write_mode = "WRITE_TRUNCATE"
+    #else:
+    #    write_mode = "WRITE_APPEND"
+
 #Nettoyage des noms de colonnes.
 #BigQuery impose des regles strictes sur le nom des colonnes
 #doivent commencer par '_' ou une lettre et nom un chiffre ou un
 # symbole
     data.columns = [f"_{column}" if not str(column)[0].isalpha() and not str(column)[0] == "_" else str(column) for column in data.columns]
+    # Remplacer les caractères non autorisés et les espaces par des underscores
+    data.columns = data.columns.str.replace(r'[^a-zA-Z0-9_]', '_', regex=True)
 #initialisation de bigquery
     client = bigquery.Client()
-
 #Cette partie configure la manière dont les données seront écrites dans la table BigQuery
     write_mode = "WRITE_TRUNCATE" if truncate else "WRITE_APPEND"
     job_config = bigquery.LoadJobConfig(write_disposition=write_mode)

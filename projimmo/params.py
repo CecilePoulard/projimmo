@@ -27,7 +27,7 @@ INSTANCE = os.environ.get("INSTANCE")
 ##################  CONSTANTS  #####################
 LOCAL_DATA_PATH = "raw_data/"#valeursfoncieres-2023.txt
 #os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "data")
-#LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
+LOCAL_REGISTRY_PATH = "registry/"
 
 COLUMN_NAMES_RAW = ['Date mutation', 'Nature mutation', 'Valeur fonciere',
         'Type de voie', 'Code postal', 'Surface Carrez du 1er lot',

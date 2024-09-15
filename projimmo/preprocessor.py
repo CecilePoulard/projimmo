@@ -60,5 +60,6 @@ def preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
     # Créer la DataFrame avec les noms de colonnes
     X_trans_df = pd.DataFrame(X_trans_dense, columns=feature_names)
     print("✅ X_processed, with shape", X_trans_df.shape)
+    X_trans_df.columns = ['valeur_fonciere' if col == 0 else col for col in X_trans_df.columns]
 
     return X_trans_df

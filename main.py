@@ -4,9 +4,17 @@ import os
 import pandas as pd
 from google.cloud import bigquery
 from pathlib import Path
+import joblib
+import xgboost as xgb
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
 from projimmo.params import *
 from projimmo.data import *
+from projimmo.preprocessor import *
+from projimmo.model import *
+from projimmo.registry import *
 
 def load_all_files():
     """
@@ -19,23 +27,29 @@ def load_all_files():
         raise ValueError(f"{data_local_path} n'est pas un répertoire valide.")
 
     table=f"DVF_cleaned_{DATA_YEAR}"
-    #all_files = [f for f in data_local_path if f.is_file()]
     all_files = list(data_local_path.glob('*.txt'))
-
     if not all_files:
         print("Aucun fichier CSV trouvé dans le répertoire spécifié.")
-        return
+        return table
+    client = bigquery.Client()
+    if table_exists(client, BQ_DATASET, table):
+        print(f"La table {table} existe déjà. Aucune donnée ne sera chargée.")
+        return table
 
     for file in all_files:
-        df = pd.read_csv(file, sep="|", dtype=str)
-        print(file)
-        clean_and_load(df)
+        for chunk in pd.read_csv(file, sep="|", dtype=str, chunksize=CHUNK_SIZE):
+            #if not data_already_loaded(table, chunk):
+            clean_and_load(chunk, table)
+            #else:
+            #    print(f"Les données de {file} sont déjà chargées dans la table.")
+
+
     return table
 
 
 def clean_and_load(df, table):
     """
-    Nettoie le df en param et la charge dans bigQuery
+    Nettoie le df et le charge dans bigQuery
     """
     #df = pd.concat(df_list, ignore_index=True)
     #print("concat ok")
@@ -43,6 +57,7 @@ def clean_and_load(df, table):
     print("✅  clean ok \n")
     df = clean_outliers(df)
     print("✅ outliers ok\n")
+
     load_data_to_bq(
     data=df,
     gcp_project=GCP_PROJECT,
@@ -51,54 +66,184 @@ def clean_and_load(df, table):
     truncate=False ) # Append the data to the existing table
     print("✅ load ok\n")
 
-def preprocess():
-    table_cleaned=load_all_files()
+
+def data_already_loaded(table, df):
+    """
+    Vérifie si les données sont déjà présentes dans la table BigQuery
+    Retourne True si les données sont déjà présentes, False sinon
+    """
+    client = bigquery.Client()
+
+    # Extraire une ou plusieurs colonnes uniques de ton dataframe pour vérifier s'ils existent déjà
+    # Assumons que tu as une colonne 'id' ou un identifiant unique
+    unique_ids = df['id'].unique().tolist()
+
+    # Créer une requête pour vérifier les ids déjà présents
+    query = f"""
+        SELECT id
+        FROM `{GCP_PROJECT}.{BQ_DATASET}.{table}`
+        WHERE id IN UNNEST(@unique_ids)
+    """
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ArrayQueryParameter("unique_ids", "STRING", unique_ids)
+        ]
+    )
+
+    query_job = client.query(query, job_config=job_config)
+
+    results = query_job.result().to_dataframe()
+
+    if not results.empty:
+        print("Les données existent déjà dans la table.")
+        return True
+    else:
+        return False
+
+
+
+
+def table_exists(client, dataset_id, table_id):
+    """
+    Vérifie si la table existe dans le dataset BigQuery.
+    """
+    try:
+        client.get_table(f"{dataset_id}.{table_id}")
+        return True
+    except Exception as e:
+        if "Not found" in str(e):
+            return False
+        else:
+            raise
+
+
+
+
+
+
+
+
+def preprocess(table):
+    #table_cleaned=load_all_files()
     query = f"""
         SELECT *
-        FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table_cleaned}
+        FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table}
     """
-    #Pour écrire dans big query le df notre choix
-#load_data_to_bq(
-#        df_de_notre_choix,
- #       gcp_project=GCP_PROJECT,
- #       bq_dataset=BQ_DATASET,
- #       table=table_cleaned',
- #       truncate=True
-  #  )
+    table_out= f"DVF_preproc_{DATA_YEAR}"
+    client = bigquery.Client()
+    if table_exists(client, BQ_DATASET, table_out):
+        print(f"La table {table_out} existe déjà. \nLes datas ont déjà été préprocess.")
+        return table_out
+    data_query_cache_path = Path(LOCAL_DATA_PATH).joinpath(f"query_{DATA_YEAR}.csv")
     df_to_preproc=get_data_with_cache(
         query=query,
         gcp_project=GCP_PROJECT,
-       # cache_path:Path,
+       cache_path=data_query_cache_path,
         data_has_header=True
    )
 
+    df_preproc=preprocess_features(df_to_preproc)
 
+
+    load_data_to_bq(
+    data=df_preproc,
+    gcp_project=GCP_PROJECT,
+    bq_dataset=BQ_DATASET,
+    table=table_out,
+    truncate=True )
+    return table_out,df_preproc
+
+
+
+
+def train_and_save_best_model(X, y, model_types=['KNR', 'LR', 'XGB'], test_size=0.2):
+    """
+    Entraîne les modèles spécifiés, évalue leur performance, récupère le meilleur modèle, et l'enregistre en local.
+
+    Parameters:
+    - X: Les caractéristiques des données.
+    - y: Les cibles des données.
+    - model_types: Liste des types de modèles à entraîner.
+    - test_size: Taille de l'ensemble de test pour la séparation des données.
+
+    Returns:
+    - best_model: Le meilleur modèle entraîné.
+    - best_model_type: Le type de modèle du meilleur modèle.
+    """
+
+    # Séparer les données en ensembles d'entraînement et de test
+    X_train, X_test, y_train, y_test = split_df(X, y, test_size=test_size)
+
+    best_model = None
+    best_model_type = None
+    best_r2_score = -float('inf')  # Commencer avec une valeur très basse pour les scores R²
+
+    # Entraîner et évaluer chaque modèle
+    for model_type in model_types:
+        print(f"Entraînement du modèle: {model_type}")
+
+        # Initialiser le modèle
+        model = initialize_model(model_type)
+
+        # Entraîner le modèle
+        model = train_model(X_train, y_train, model)
+
+        # Évaluer le modèle
+        metrics = evaluate_model(X_test, y_test, model, model_type)
+
+        # Comparer les performances
+        if metrics['r2'] > best_r2_score:
+            best_r2_score = metrics['r2']
+            best_model = model
+            best_model_type = model_type
+
+    if best_model is None:
+        raise ValueError("Aucun modèle n'a été entraîné correctement.")
+
+    # Enregistrer le meilleur modèle
+    #model_filename = f"best_model_{best_model_type}.pkl"
+    #joblib.dump(best_model, model_filename)
+    #print(f"Le meilleur modèle ({best_model_type}) a été enregistré sous le nom {model_filename}.")
+    # Sauvegarder le modèle avec save_model
+    save_model(best_model)
+
+    return best_model, best_model_type
+
+
+
+#def pre_model(X,y,model_type):
+#    X_train,X_test,y_train,y_test=split_df(X,y)
+
+#    model=initialize_model(model_type)
+    # Effectuer la validation croisée
+#    cv_results = cross_validate_model(X_train, y_train, model)
+#    print("\nSans validation croisée:")
+ #   fitted_model=train_model(X_train,y_train,model)
+#    metrics=evaluate_model(X_test,y_test,fitted_model, model_type)
+#    return metrics
 if __name__ == "__main__":
-#    concat_and_load() # A faire qu'une fois!! Sinon va ajouter
+    table_to_preproc=load_all_files()
+    table_preproc=preprocess(table_to_preproc)
 
 
+    query = f"""
+        SELECT *
+        FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table_preproc}
+    """
+    data_query_cache_path = Path(LOCAL_DATA_PATH).joinpath(f"query_{DATA_YEAR}.csv")
+    df_preproc=get_data_with_cache(
+        query=query,
+        gcp_project=GCP_PROJECT,
+       cache_path=data_query_cache_path,
+        data_has_header=True
+   )
+    X = df_preproc.drop(columns='valeur_fonciere')
+    y = df_preproc['valeur_fonciere']
+
+    best_model, best_model_type = train_and_save_best_model(X, y)
 
 
-
-
-
-
-
-
-
-
-
-
-
-#def preprocess(min_date:str = '2009-01-01', max_date:str = '2015-01-01') -> None:
- #   """
- #   - Query the raw dataset from Le Wagon's BigQuery dataset
- #   - Cache query result as a local CSV if it doesn't exist locally
-#    - Process query data
-#    - Store processed data on your personal BQ (truncate existing table if it exists)
- #   - No need to cache processed data as CSV (it will be cached when queried back from BQ during training)
-#    """
-
+    model_type=best_model_type
 
 
 
