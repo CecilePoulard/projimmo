@@ -15,6 +15,7 @@ from projimmo.data import *
 from projimmo.preprocessor import *
 from projimmo.model import *
 from projimmo.registry import *
+from projimmo.optimize_model import *
 
 def load_all_files():
     """
@@ -141,10 +142,12 @@ def preprocess(table):
        cache_path=data_query_cache_path,
         data_has_header=True
    )
+    # Prétraiter les caractéristiques
+    global preproc_baseline
+    df_preproc, preproc_baseline =preprocess_features(df_to_preproc)
 
-    df_preproc=preprocess_features(df_to_preproc)
-
-
+    # Sauvegarder le transformateur
+    joblib.dump(preproc_baseline, 'preproc_baseline.pkl')
     load_data_to_bq(
     data=df_preproc,
     gcp_project=GCP_PROJECT,
@@ -226,30 +229,71 @@ if __name__ == "__main__":
     table_preproc=preprocess(table_to_preproc)
 
 
-    query = f"""
-        SELECT *
-        FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table_preproc}
-    """
-    data_query_cache_path = Path(LOCAL_DATA_PATH).joinpath(f"query_{DATA_YEAR}.csv")
-    df_preproc=get_data_with_cache(
-        query=query,
-        gcp_project=GCP_PROJECT,
-       cache_path=data_query_cache_path,
-        data_has_header=True
-   )
-    X = df_preproc.drop(columns='valeur_fonciere')
-    y = df_preproc['valeur_fonciere']
+  #  query = f"""
+  #      SELECT *
+  #      FROM `{GCP_PROJECT}`.{BQ_DATASET}.{table_preproc}
+  #  """
+  #  data_query_cache_path = Path(LOCAL_DATA_PATH).joinpath(f"query_{DATA_YEAR}.csv")
+  #  df_preproc=get_data_with_cache(
+  #      query=query,
+  #      gcp_project=GCP_PROJECT,
+  #     cache_path=data_query_cache_path,
+  #      data_has_header=True
+   #)
+  #  X = df_preproc.drop(columns='valeur_fonciere')
+  #  y = df_preproc['valeur_fonciere']
 
-    best_model, best_model_type = train_and_save_best_model(X, y)
+  #  best_model, best_model_type = train_and_save_best_model(X, y)
+  #  X_train, X_test, y_train, y_test = split_df(X, y)
+  #  model_type=best_model_type
+    #best_model=initialize_model(best_model_type)#, max_depth=max_depth, eta=eta, n_estimators=n_estimators)
+
+  #  best_model=load_model()
+# Validation croisée sur les données transformées par PCA
+  #  cv_results_best_model = cross_validate_model(X_train, y_train, best_model)
+  #  mean_cv_best_mode = {'mean MSE': np.mean(- cv_results_best_model['test_score']),'STD MSE':np.std(- cv_results_best_model['test_score'])}
+
+# Entraîner le modèle sur les données réduites
+    #fitted_model_XGB_opti = train_model(X_train, y_train, model_XGB_opti)
+  #  metrics_base= evaluate_model(X_test, y_test, best_model, model_type)
+  #  best_params=grid_search(X_train, y_train, model_type,best_model)
+
+  #  eta=best_params['eta']
+  #  max_depth=best_params['max_depth']
+  #  n_estimators=best_params['n_estimators']
+   # model_XGB_opti=initialize_model(model_type, max_depth=max_depth, eta=eta, n_estimators=n_estimators)
+        # Validation croisée sur les données transformées par PCA
+   # cv_results_XGB_opti = cross_validate_model(X_train, y_train, model_XGB_opti)
+  #  mean_cv_XGB_opti = {'mean MSE': np.mean(- cv_results_XGB_opti['test_score']),'STD MSE':np.std(- cv_results_XGB_opti['test_score'])}
+
+        # Entraîner le modèle sur les données réduites
+  #  fitted_model_XGB_opti = train_model(X_train, y_train, model_XGB_opti)
+
+        # Évaluer le modèle sur les données de test transformées
+   # metrics_XGB_opti = evaluate_model(X_test, y_test, fitted_model_XGB_opti, model_type)
+
+  #  save_model(fitted_model_XGB_opti)
+    # Create a dictionary to hold the results
+   # results_dict = {
+   #     'Model': ['Base', 'Optimized'],
+   #     'MSE': [metrics_base['mse'], metrics_XGB_opti['mse']],
+   #     'MAE': [metrics_base['mae'], metrics_XGB_opti['mae']],
+  #      'R2': [metrics_base['r2'], metrics_XGB_opti['r2']],
+  #      'RMSE': [metrics_base['rmse'], metrics_XGB_opti['rmse']],
+   #     'MSLE': [metrics_base['msle'], metrics_XGB_opti['msle']],
+   #     'Best Params': ['N/A', str(best_params)],
+                # Ajout des scores de validation croisée pour les deux modèles
+  #      'CV_MEAN_MSE': [mean_cv_best_mode['mean MSE'], mean_cv_XGB_opti['mean MSE']],
+  #      'CV_STD_MSE': [mean_cv_best_mode['STD MSE'], mean_cv_XGB_opti['STD MSE']],
+  #  }
 
 
-    model_type=best_model_type
+    # Convert the dictionary to a pandas DataFrame
+  #  results_df = pd.DataFrame(results_dict)
 
-
-
-
-
-
+    # Save the DataFrame to a CSV file
+   # results_df.to_csv('model_evaluation_results.csv', index=False)
+   # print("✅ Model evaluation results saved to 'model_evaluation_results.csv'")
 
 
 

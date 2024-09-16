@@ -3,6 +3,7 @@ setup.py
 projimmo/__init__.py
 projimmo/data.py
 projimmo/encoders.py
+projimmo/fast.py
 projimmo/model.py
 projimmo/optimize_model.py
 projimmo/params.py

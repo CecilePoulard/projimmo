@@ -62,4 +62,4 @@ def preprocess_features(X: pd.DataFrame) -> pd.DataFrame:
     print("✅ X_processed, with shape", X_trans_df.shape)
     X_trans_df.columns = ['valeur_fonciere' if col == 0 else col for col in X_trans_df.columns]
 
-    return X_trans_df
+    return X_trans_df,preproc_baseline

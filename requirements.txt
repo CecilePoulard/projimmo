@@ -29,4 +29,11 @@ pyarrow
 
 
 xgboost
+# API
+fastapi         # API framework
+pytz            # time zone management
+uvicorn         # web server
+# tests
+httpx           # HTTP client
+pytest-asyncio  # asynchronous I/O support for pytest
 # prevent bq 3+ db-dtypes package error when running training from bq
