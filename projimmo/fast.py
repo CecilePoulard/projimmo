@@ -95,6 +95,7 @@ def predict(
     X_processed_df.columns = cleaned_columns
     X_processed_df.drop(columns='valeur_fonciere',inplace=True)
     model = app.state.model
+    assert model is not None
     y_pred = model.predict(X_processed_df)
     # Retourner la prédiction sous forme de dictionnaire
     return {

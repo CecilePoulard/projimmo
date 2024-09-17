@@ -4,7 +4,7 @@ import joblib
 from google.cloud import storage
 import xgboost as xgb
 from colorama import Fore, Style
-
+import glob
 from projimmo.params import *
 
 def save_model(model: xgb.Booster) -> None:
@@ -44,7 +44,10 @@ def load_model() -> xgb.Booster:
     - locally (latest one in alphabetical order)
     - or from GCS (most recent one) if MODEL_TARGET=='gcs'
     """
+    print(Fore.BLUE + f"\nDans la fonction {MODEL_TARGET}" + Style.RESET_ALL)
+
     if MODEL_TARGET == "local":
+
         print(Fore.BLUE + f"\nLoad latest model from local registry..." + Style.RESET_ALL)
 
         # Get the latest model version name by the timestamp on disk
@@ -69,13 +72,26 @@ def load_model() -> xgb.Booster:
 
         client = storage.Client()
         blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models/"))
-
+            #if not blobs:
+        print(f"❌ {blobs}")
         try:
+            print(f"❌❌❌❌❌ {BUCKET_NAME}")
+
+
+            #    return None
             latest_blob = max(blobs, key=lambda x: x.updated)
-            latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH, latest_blob.name)
+            #if not latest_blob:
+            print(f"❌ {latest_blob}")
+            #    return None
+            latest_model_path_to_save = os.path.join(latest_blob.name) #LOCAL_REGISTRY_PATH,
+            print(f"{latest_model_path_to_save}")
+            #if not latest_model_path_to_save:
+            #    print(f"❌ No latest_model_path_to_save")
+            #    return None
+            os.makedirs(os.path.dirname(latest_model_path_to_save), exist_ok=True)
             latest_blob.download_to_filename(latest_model_path_to_save)
             latest_model = joblib.load(latest_model_path_to_save)
-
+            print(f"{latest_model}")
             #latest_model = xgb.Booster()
             #latest_model.load_model(latest_model_path_to_save)
 

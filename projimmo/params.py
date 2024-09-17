@@ -3,17 +3,27 @@ import os
 import numpy as np
 
 ##################  VARIABLES  ##################
-DATA_SIZE = os.environ.get("DATA_SIZE")
+#DATA_SIZE = "ALL"
+#os.environ.get("DATA_SIZE")
+#CHUNK_SIZE = 1_000_000
 CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE"))
 DATA_DIR = os.environ.get("DATA_DIR")
 DATA_YEAR = os.environ.get("DATA_YEAR")
-MODEL_TARGET = os.environ.get("MODEL_TARGET")
-GCP_PROJECT = os.environ.get("GCP_PROJECT")
+#MODEL_TARGET = "gcs"
+MODEL_TARGET =os.environ.get("MODEL_TARGET")
+#GCP_PROJECT = "wagon-bootcamp-429817"
+GCP_PROJECT =os.environ.get("GCP_PROJECT")
+#GCP_PROJECT_WAGON = "wagon-public-datasets"
 GCP_PROJECT_WAGON = os.environ.get("GCP_PROJECT_WAGON")
-GCP_REGION = os.environ.get("GCP_REGION")
-BQ_DATASET = os.environ.get("BQ_DATASET")
+#GCP_REGION = "europe-west1"
+GCP_REGION =os.environ.get("GCP_REGION")
+#BQ_DATASET = "projimmo_datas"
+BQ_DATASET =os.environ.get("BQ_DATASET")
+#BQ_REGION = "EU"
 BQ_REGION = os.environ.get("BQ_REGION")
-BUCKET_NAME = os.environ.get("BUCKET_NAME")
+#BUCKET_NAME = "projimmo"
+BUCKET_NAME =os.environ.get("BUCKET_NAME")
+#INSTANCE = "projimmo-training"
 INSTANCE = os.environ.get("INSTANCE")
 #MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
 #MLFLOW_EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT")
@@ -21,8 +31,11 @@ INSTANCE = os.environ.get("INSTANCE")
 #PREFECT_FLOW_NAME = os.environ.get("PREFECT_FLOW_NAME")
 #PREFECT_LOG_LEVEL = os.environ.get("PREFECT_LOG_LEVEL")
 #EVALUATION_START_DATE = os.environ.get("EVALUATION_START_DATE")
-#GAR_IMAGE = os.environ.get("GAR_IMAGE")
-#GAR_MEMORY = os.environ.get("GAR_MEMORY")
+#/home/cpoulard/code/CecilePoulard/
+#GOOGLE_APPLICATION_CREDENTIALS="/gcp/wagon-bootcamp-429817-511f35e74646.json"
+#GAR_IMAGE = "projimmo"
+GAR_IMAGE =os.environ.get("GAR_IMAGE")
+GAR_MEMORY = os.environ.get("GAR_MEMORY")
 
 ##################  CONSTANTS  #####################
 LOCAL_DATA_PATH = "raw_data/"#valeursfoncieres-2023.txt
