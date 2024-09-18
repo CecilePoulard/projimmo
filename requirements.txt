@@ -10,7 +10,7 @@ matplotlib
 pygeohash
 pytest
 seaborn
-numpy
+#numpy
 #pandas
 scipy==1.10.0
 scikit-learn==1.3.1
