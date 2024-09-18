@@ -126,14 +126,14 @@ with st.form(key='params_for_api'):
 
 # Check if the form is submitted
 if submitted:
-        # Check if any of the surface inputs are zero
-    if somme_surface_carrez == 0.0 and surface_reelle_bati == 0.0 and surface_terrain == 0.0:
+        # Check if any of the surface inputs are zero  and surface_terrain == 0.0
+    if somme_surface_carrez == 0.0 and surface_reelle_bati == 0.0:
         st.error("Veuillez entrer au moins une surface (Surface Carrez, Surface réelle bâtie ou Surface du terrain).")
 
-    # Check if any of the inputs are zero or empty
+    # Check if any of the inputs are zero or empty surface_terrain == 0 and
     if (type_de_voie == 0 and nombre_de_lots == 0 and code_type_local == 0 and
         surface_reelle_bati == 0 and nombre_pieces_principales == 0 and
-        surface_terrain == 0 and month_mutation == 0 and year_mutation == 0 and
+        month_mutation == 0 and year_mutation == 0 and
         somme_surface_carrez == 0 and departement == 0):
 
         # If no parameters are entered, set prediction to 0
@@ -147,7 +147,7 @@ if submitted:
             'code_type_local': code_type_local,
             'surface_reelle_bati': surface_reelle_bati,
             'nombre_pieces_principales': nombre_pieces_principales,
-            'surface_terrain': surface_terrain,
+           # 'surface_terrain': surface_terrain,
             'month_mutation': month_mutation,
             'year_mutation': year_mutation,
             'somme_surface_carrez': somme_surface_carrez,
