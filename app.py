@@ -161,6 +161,6 @@ if submitted:
         data = response.json()
 
         # Retrieve and display the prediction
-        #pred = data['prediction']
-        st.header(data)
-        #st.header(f'Prédiction du prix: {round(pred, 2)} €')
+        pred = data['prediction']
+        #st.header(data)
+        st.header(f'Prédiction du prix: {round(pred, 2)} €')
