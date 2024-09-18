@@ -9,7 +9,7 @@ yapf
 matplotlib
 pygeohash
 pytest
-seaborn
+#seaborn
 #numpy
 #pandas
 scipy==1.10.0
