@@ -36,11 +36,12 @@ def predict(
     code_type_local: int,  # {'maison': 1, 'appartement': 2}
     surface_reelle_bati: float ,
     nombre_pieces_principales: float,
-    surface_terrain: float,
+
     month_mutation: int ,
     year_mutation: int ,
     somme_surface_carrez: float ,
     departement: int # ['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
+    ,surface_terrain: float=0.
     ,valeur_fonciere: float=0.
 ):
     # Création du DataFrame à partir des données fournies

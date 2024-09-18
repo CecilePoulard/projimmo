@@ -82,7 +82,7 @@ with st.form(key='params_for_api'):
 #Surface réelle ou séparations et arrondie au bâti mètre carré inférieur. Les
 #surfaces des dépendances ne sont pas prises en compte.
     somme_surface_carrez = st.number_input("Surface carrez", value=0.0, min_value=0.0 )
-    surface_terrain = st.number_input("Surface du terrain", value=0.0, min_value=0.0 )
+    #surface_terrain = st.number_input("Surface du terrain", value=0.0, min_value=0.0 )
 
 
 
