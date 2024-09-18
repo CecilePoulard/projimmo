@@ -42,7 +42,7 @@ def predict(
     somme_surface_carrez: float ,
     departement: int # ['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
     ,surface_terrain: float=0.,
-    ,valeur_fonciere: float=0.
+    valeur_fonciere: float=0.
 ):
     # Création du DataFrame à partir des données fournies
     X_pred = pd.DataFrame({
