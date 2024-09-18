@@ -104,7 +104,7 @@ with st.form(key='params_for_api'):
 
 
 
-    nombre_pieces_principales = st.number_input("Pickup nombre_pieces_principales",format="%d", value=0)
+    nombre_pieces_principales = st.number_input("Nombre de pièces",format="%d", value=0)
     st.markdown("*Les cuisines, salles d’eau et dépendances ne sont pas prises en compte.*")
     # Section 3: Info générales sur la période
     st.subheader("Informations générales sur le date d'achat")
