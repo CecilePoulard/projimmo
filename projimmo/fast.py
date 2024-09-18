@@ -30,17 +30,18 @@ app.state.preproc_baseline = joblib.load('preproc_baseline.pkl')
 
 @app.get("/predict")
 def predict(
-    valeur_fonciere: float = 0.0,
-    type_de_voie: str = 'AUTRE',  # ['RUE', 'AV', 'CHE', 'BD', 'RTE', 'ALL', 'IMP', 'PL', 'RES', 'CRS','AUTRE']
-    nombre_de_lots: int = 1,
-    code_type_local: int = 2,  # {'maison': 1, 'appartement': 2}
-    surface_reelle_bati: float = 0.0,
-    nombre_pieces_principales: float = 1.0,
-    surface_terrain: float = 0.0,
-    month_mutation: int = 1,
-    year_mutation: int = 2023,
-    somme_surface_carrez: float = 0.0,
-    departement: int = 13  # ['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
+
+    type_de_voie: str,  # ['RUE', 'AV', 'CHE', 'BD', 'RTE', 'ALL', 'IMP', 'PL', 'RES', 'CRS','AUTRE']
+    nombre_de_lots: int,
+    code_type_local: int,  # {'maison': 1, 'appartement': 2}
+    surface_reelle_bati: float ,
+    nombre_pieces_principales: float,
+    surface_terrain: float,
+    month_mutation: int ,
+    year_mutation: int ,
+    somme_surface_carrez: float ,
+    departement: int # ['75', '13', '69', '31', '06', '44', '34', '67', '33', '59']
+    ,valeur_fonciere: float=0.
 ):
     # Création du DataFrame à partir des données fournies
     X_pred = pd.DataFrame({

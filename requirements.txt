@@ -1,5 +1,5 @@
 #Fichier contenant toutes les librairies nécessaires à la librairie projimmo
-
+streamlit
 wheel
 nbresult
 colorama
@@ -10,7 +10,7 @@ matplotlib
 pygeohash
 pytest
 seaborn
-numpy==1.23.5
+numpy
 pandas
 scipy==1.10.0
 scikit-learn==1.3.1
