@@ -1,34 +1,30 @@
-#Fichier pour créer des raccourcis, i.e. regrouper des lignes sur le terminal
+# Makefile pour automatiser les tâches courantes du projet.
 
-#@pip uninstall -y taxifare || :
-# SYNTAXE pour l'appeler:
-#make <some_action>
-#
+# Utilisation :
+# - Pour installer le package en mode développement : `make install_package`
+# - Pour nettoyer les fichiers générés automatiquement et cachés : `make clean`
 
-# SYNTAXE dans le fichier:
-# nom_de_la_directive:
-# <tab> directive avec différents arguments
-# <tab> @ action "masqué" (i.e. l'action demandée ne sera pas affichée dans le terminal lors de l'execution)
-# <tab> - (par défaut une action qui ne fonctionne pas dans le terminal, celles qui
-# qui suivent ne seront pas executées. Sauf s'il y a un '-', alors elle sera executée quoi qu'il)
-# <tab> -@
+# ===================================
+# INSTALLATION DU PACKAGE
+# ===================================
 
-## Dans le terminal 'make install_package'
+## Installe le package en mode développement en le désinstallant d'abord
 install_package:
-	@pip uninstall -y projimmo || :
-	@pip install -e .
+	@pip uninstall -y projimmo || :     # Désinstalle projimmo s'il est déjà installé
+	@pip install -e .                   # Installe le package en mode édition (développement)
 
+# ===================================
+# NETTOYAGE DES FICHIERS TEMPORAIRES
+# ===================================
 
-
-##################### CLEANING #####################
-#supprime tous les fichiers cachés
+## Supprime les fichiers temporaires et les fichiers générés pour nettoyer le projet
 clean:
-	@rm -f */version.txt
-	@rm -f .coverage
-	@rm -fr **/__pycache__ **/*.pyc
-	@rm -fr **/build **/dist
-	@rm -fr proj-*.dist-info
-	@rm -fr proj.egg-info
-	@rm -f **/.DS_Store
-	@rm -f **/*Zone.Identifier
-	@rm -f **/.ipynb_checkpoints
+	@rm -f */version.txt                # Supprime les fichiers version.txt
+	@rm -f .coverage                     # Supprime le fichier de couverture des tests
+	@rm -fr **/__pycache__ **/*.pyc      # Supprime les caches Python compilés
+	@rm -fr **/build **/dist             # Supprime les dossiers de distribution et de build
+	@rm -fr proj-*.dist-info             # Supprime les dossiers d'informations de distribution de projimmo
+	@rm -fr proj.egg-info                # Supprime les dossiers egg-info du projet
+	@rm -f **/.DS_Store                  # Supprime les fichiers .DS_Store générés par macOS
+	@rm -f **/*Zone.Identifier           # Supprime les fichiers Zone.Identifier (Windows)
+	@rm -f **/.ipynb_checkpoints         # Supprime les checkpoints générés par Jupyter Notebook

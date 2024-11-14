@@ -1,57 +1,58 @@
-#setup.py
+"""
+setup.py
 
-from setuptools import find_packages
-from setuptools import setup
 
+
+Ce script configure et initialise le package Python `projimmo` pour la modélisation des prix de l'immobilier.
+
+Le fichier `setup.py` est utilisé par setuptools pour empaqueter le projet avec les dépendances, métadonnées
+et informations nécessaires. Une fois configuré, il permet d'installer `projimmo` dans un environnement Python
+en utilisant `pip install .` ou `pip install -e .` pour le mode édition.
+
+Sections principales :
+----------------------
+1. Lecture des dépendances depuis le fichier `requirements.txt`
+   - Lit chaque ligne du fichier `requirements.txt` pour collecter les packages requis.
+   - Exclut les dépendances installées directement depuis un dépôt git (`git+`), car elles doivent être installées
+     manuellement.
+
+2. Définition des métadonnées et des dépendances via `setup()`
+   - `name` : Nom du package (ici, `projimmo`).
+   - `description` : Brève description du package, précisant son objectif (modélisation de prix immobiliers).
+   - `author` : Liste des auteurs du projet.
+   - `install_requires` : Spécifie les dépendances requises, issues de `requirements.txt`.
+   - `packages` : Inclut tous les sous-modules du package en utilisant `find_packages()`.
+
+Utilisation :
+-------------
+Pour installer le package et ses dépendances, exécutez l'une des commandes suivantes depuis le répertoire
+contenant `setup.py` :
+
+- Installation standard : `pip install .`
+- Installation en mode édition (permet de détecter les modifications du code) : `pip install -e .`
+
+Ces commandes créent une entrée `projimmo` dans les packages Python installés, visible avec `pip list`.
+
+Exemples supplémentaires :
+--------------------------
+- Pour inclure des scripts, ajouter le paramètre `scripts` dans `setup()`.
+- Pour spécifier une version de Python minimale requise, ajouter `python_requires='>=3.x'`.
+
+"""
+
+from setuptools import find_packages, setup
+
+# Lecture du fichier des dépendances (requirements.txt)
 with open("requirements.txt") as f:
     content = f.readlines()
+# Exclut les dépendances installées depuis un dépôt git
 requirements = [x.strip() for x in content if "git+" not in x]
 
-
-setup(name='projimmo',
-      description="Modelisation du prix de l'immobilier",
-      author="Lallie, Fayssal, Cecile",
-      install_requires=requirements, #va chercher les package dont on a besoin listé dans requirements.txt
-      packages=find_packages(),#librairies dans notre environnement. NB: ici que ["projimmo"]
-      )
-
-
-
-
-
-
-
-
-
-
-
-############ TERMINAL ################
-
-##create new projimmoenv inside python 3.10.6
-#pyenv virtualenv 3.10.6 projimmoenv
-
-##In project projimmo, create '.python-version' that
-##activates projimmoenv when present
-#pyenv local projimmoenv
-
-##Pour savoir les version des librairies
-#pip list
-## Pour mettre à jour les librairies présentes dans notre environnement
-#pip install --upgrade pip
-
-## Installations de base
-#pip install pandas
-#pip install ipython   # needed for ipython
-#pip install ipykernel # needed for notebooks
-
-## Installation de la librairies projimmo dans notre environnement virtuel
-#pip install . ou pip install -e . #-> '-e' permet de mettre à jour la librairie
-                                # quand les fichiers sont modifiés (mieux!)
-## normalement installe la libraire, à verifier avec:
-#pip freeze #-->projimmo doit être dans la liste
-
-
-
-## Quand on utilise un ipynb, mettre au début (pour eviter de devoir relancer le kernel à chaque modif de la librairie):
-#%load_ext autoreload
-#%autoreload_2
+# Configuration de la distribution du package
+setup(
+    name='projimmo',                                  # Nom du package
+    description="Modélisation du prix de l'immobilier", # Description du projet
+    author="Lallie, Fayssal, Cecile",                 # Auteurs du projet
+    install_requires=requirements,                    # Dépendances du projet
+    packages=find_packages()                          # Recherche des packages inclus dans le projet
+)
