@@ -3,6 +3,10 @@
 Projimmo est un projet de mise en application de nos connaissances acquises lors du bootcamp Data Science/IA ayant eu lieu l'été 2024.
 L'objectif est d'estimer le prix d'un bien immobilier situé dans une des 10 plus grandes villes françaises.
 
+Lien vers la demo:
+https://projimmo-mxcxkhpzy7d5whjfjtexyt.streamlit.app/
+
+
 ## Equipe
 Cécile Poulard
 
@@ -44,6 +48,10 @@ https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/
 - Création d'une API à l'aide de FastAPI
 
 - Déploiement de l'API sur streamlit
+
+Lien vers la demo:
+https://projimmo-mxcxkhpzy7d5whjfjtexyt.streamlit.app/
+
 
 ## Structure de la librairie
 
