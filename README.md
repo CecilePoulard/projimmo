@@ -65,7 +65,7 @@ projimmo/
     ├── model.py                  # Définition des modèles d'estimation des prix immobiliers
     ├── optimize_model.py         # Fonctions pour ajuster et optimiser les modèles existants
     ├── params.py                 # Gestion des paramètres ou hyperparamètres utilisés dans le projet
-     ├── preprocessor.py           # Prétraitement des données pour les rendre exploitables par les modèles
+    ├── preprocessor.py           # Prétraitement des données pour les rendre exploitables par les modèles
     └── registry.py               # Gestion d'enregistrements
 └── Exploration_notebook/       # Notebooks Jupyter pour l'exploration et le test
     ├── Best-params.ipynb       # Test pour sélectionner les meilleurs paramètres du modèle
@@ -74,6 +74,6 @@ projimmo/
     ├── explore-datas-DVF.ipynb # Notebook d'exploration des données DVF
     ├── data_final.ipynb                         # Notebook traitant les étapes finales de préparation et nettoyage des données avant modélisation
     ├── dataviz.ipynb                            # Notebook dédié à la visualisation des données brutes, pour identifier les tendances ou anomalies
-    └──datavizpostclean.ipynb                   # Visualisation des données après nettoyage, pour valider la qualité des transformations effectuées
+    └── datavizpostclean.ipynb                   # Visualisation des données après nettoyage, pour valider la qualité des transformations effectuées
 
 ```
