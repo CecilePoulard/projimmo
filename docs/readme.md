@@ -34,6 +34,19 @@
 
 
 
+Configuration
+Projimmo utilise des variables d’environnement pour des configurations sensibles. Placez les variables nécessaires dans .env ou .env.yaml. Quelques exemples de configurations peuvent inclure :
+
+env
+Copier le code
+DATABASE_URL="your_database_url"
+API_KEY="your_api_key"
+DEBUG=True
+Ajoutez également les informations requises pour le modèle et les chemins d'accès aux données si nécessaire.
+
+
+
+
 
 
 
